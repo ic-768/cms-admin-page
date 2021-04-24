@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import {useState,useEffect} from "react"
+import {Route} from "react-router-dom"; 
+import Banner from './Components/Banner'
+import Home from './Pages/Home'
+import AdminCenter from './Pages/AdminCenter' 
+import {getPages} from './API_calls/calls' 
+import './App.css'
 
 function App() {
+	const [pages,setPages]=useState(null)
+
+	useEffect(() => {
+		(async () => { // On render, get pages
+			 setPages(await getPages());
+		})(); 
+	},[]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+			<Banner username="Iannis"/>
+			<Route exact path="/"> 
+				<Home pages={pages}/>
+			</Route>
+			<Route path="/admin">  
+				<AdminCenter pages={pages}/> 
+			</Route>
     </div>
   );
-}
-
+} 
 export default App;
