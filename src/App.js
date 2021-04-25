@@ -8,6 +8,7 @@ import './App.css'
 
 function App() {
 	const [pages,setPages]=useState(null)
+	console.log(pages)
 
 	useEffect(() => {
 		(async () => { // On render, get pages
@@ -17,12 +18,12 @@ function App() {
 
   return (
     <div className="App">
-			<Banner username="Iannis"/>
+			<Banner username="Ioannis"/>
 			<Route exact path="/"> 
 				<Home pages={pages}/>
 			</Route>
 			<Route path="/admin">  
-				<AdminCenter pages={pages}/> 
+				<AdminCenter pages={pages} setPages={setPages}/> 
 			</Route>
     </div>
   );

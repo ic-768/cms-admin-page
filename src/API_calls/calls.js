@@ -1,17 +1,49 @@
 import axios from "axios"
 const baseUrl="https://pagesmanagement.azurewebsites.net/api/ResponsivePages"
 
-export const getPages=async()=>{ 
+//TODO Turn all catch blocks into notifications
+
 	const config={
-		headers:{ "Content-Type": "application/json"
-}
+		headers:{ "Content-Type": "application/json" }
 	}
+
+export const getPages=async()=>{ 
 	try{
 		const response = await axios.get(baseUrl,config) 	
 		return response.data 
 	}
 	catch{
-		console.log("Error on api call") //TODO make notification
-
+		console.log("Error on api call") 
 	}
+} 
+
+export const updatePage=async(page)=>{  
+	try{
+		await axios.put(`${baseUrl}/${page.id}`,page,config) //wait for update
+		const response=await axios.get(`${baseUrl}/${page.id}`,config) // retrieve
+		return response.data
+	}
+	catch{ 
+		console.log("Error on api call") 
 	} 
+}
+
+export const postPage=async(page)=>{   //!internal server error 24/7
+	try{
+		const response=await axios.post(baseUrl,page)
+		return response.data
+	}
+	catch{ 
+		console.log("Error on api call") 
+	} 
+}
+
+export const deletePage=async(id)=>{   
+	try{
+		const result=await axios.delete(`${baseUrl}/${id}`) 
+		return result.id 
+	}
+	catch{
+		console.log("Error on api call") 
+	}
+}
