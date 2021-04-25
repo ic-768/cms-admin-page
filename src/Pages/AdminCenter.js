@@ -1,13 +1,14 @@
+import {useState,useEffect} from "react"
+import {BiAddToQueue} from "react-icons/bi"
 import {IoIosArrowDropdown} from "react-icons/io"
+import {useHistory} from "react-router-dom" 
+import {Route,useLocation} from "react-router-dom"
+import {DragDropContext,Droppable,Draggable} from "react-beautiful-dnd"
+
 import PageCard from "../Components/PageCard"
 import PageOverlay from "../Components/PageOverlay"
 import NewOverlay from "../Components/NewOverlay"
-import {useState,useEffect} from "react"
-import {BiAddToQueue} from "react-icons/bi"
-import {useHistory} from "react-router-dom"
-
-import {Route,useLocation} from "react-router-dom"
-
+import {updatePage} from "../API_calls/calls"
 
 const AdminCenter = ({setPages,pages}) => { 
 const history = useHistory()	
@@ -55,43 +56,126 @@ return(
 		<input style={{height:"25px",margin:"5px",color:"black"}}
 			value={filterQuery}
 			onChange={(event)=>{setFilterQuery(event.target.value)}}/>
+			<BiAddToQueue style={{ alignSelf:"center",marginTop:"auto",marginBottom:"10px"}} size={70}
+			onClick={()=>{ history.push("/admin/new") }}/>
 		</div> 
 
 
 <div style={{flexGrow:"1",display:"flex",alignItems:"center",flexDirection:"column"}}> 
-			<BiAddToQueue style={{ marginTop:"10px"}} size={70}
-			onClick={()=>{ history.push("/admin/new") }}/>
-
 			<div style={{display:"flex"}}> 
+					<DragDropContext 
+					onDragEnd={async(result)=>{
+						if (!result.destination){return}  // dragged outside valid areas
+							const draggedId=result.draggableId.match(/\d+/)[0] // item id
+							const targetPage=pages.filter((page)=>page.id===parseInt(draggedId))[0]
+							const itemActivity=result.draggableId.match(/\d+ (.*)/)[1] // item currently active or inactive
+							const destActivity=result.destination.droppableId // area dragged to
 
-			{/*Green area for active pages */}
-				<div className="dragArea--active" style={{backgroundColor:"rgba(0, 255, 0, 0.15)",margin:"15px",
-				flexWrap: "wrap",  display: "flex", borderRadius:"10px",
-				minHeight:"500px",minWidth:"500px",justifyContent:"center"}}>
-					{ filteredResults && filteredResults.map((page, i) => //TODO there's definitely a way to optimise the sorting
-						page.isActive && <PageCard page={page} pages={page} setPages={setPages} key={ `${page.title}${i}` } />
-					) }
+							if (itemActivity ==="active" && destActivity ==="inactive" ) { // set inactive
+								try{ 
+									const updatedPage=await updatePage({...targetPage,isActive:false})  
+									setPages((pages.filter((page)=>page.id!==parseInt(draggedId)).concat(updatedPage)))
+								}
+								catch{
+									console.log("error") // TODO notifications
+								}
+							} 
+							else if  (itemActivity==="inactive" && destActivity ==="active"){ //set active
+								try{
+									const updatedPage=await updatePage({...targetPage,isActive:true})
+									setPages((pages.filter((page)=>page.id!==parseInt(draggedId)).concat(updatedPage)))
+								}
+								catch{
+									console.log("error") // TODO notifications
+								}
+						}
+							return 
+						}}>
+
+						{/*area for active pages */ }
+						<Droppable droppableId={ "active" }>
+							{ (provided, snapshot) =>
+							{
+								return (
+									<div className="dragArea--active" style={ {
+										border:"1px solid white",
+										margin: "15px",
+										flexWrap: "wrap", display: "flex", borderRadius: "10px",
+										minHeight: "500px", minWidth: "500px", justifyContent: "center"
+									} }
+										{ ...provided.droppableProps }
+										ref={ provided.innerRef }
+									>
+										{ filteredResults && filteredResults.map((page, i) => //TODO there's definitely a way to optimise the sorting 
+										{
+											return <Draggable key={page.id.toString()} draggableId={`${page.id.toString()} active`} index={ i }> 
+												{ (provided, snapshot) =>
+														<div
+															ref={ provided.innerRef }
+															{ ...provided.draggableProps }
+															{ ...provided.dragHandleProps } >
+															{page.isActive && <PageCard page={ page } pages={ page } setPages={ setPages }
+																key={ `${page.id.toString()}${i}` } />}
+														</div> 
+												 }
+											</Draggable> 
+										}
+										) } 
+								{provided.placeholder}
+									</div> 
+								) 
+							} }
+						</Droppable> 
+						{/*area for inactive pages */ }
+						<Droppable droppableId={ "inactive" }>
+							{ (provided, snapshot) =>
+							{
+								return (
+									<div className="dragArea--inactive" style={ {
+										border:"1px solid white",
+										margin: "15px",
+										flexWrap: "wrap", display: "flex", borderRadius: "10px",
+										minHeight: "500px", minWidth: "500px", justifyContent: "center"
+									} }
+										{ ...provided.droppableProps }
+										ref={ provided.innerRef }
+									>
+										{ filteredResults && filteredResults.map((page, i) =>
+										{//TODO there's definitely a way to optimise the sorting 
+											return <Draggable key={page.id.toString()} draggableId={`${page.id.toString()} inactive`} index={ i }> 
+												{ (provided, snapshot) =>
+												{
+													return (
+														<div
+															ref={ provided.innerRef }
+															{ ...provided.draggableProps }
+															{ ...provided.dragHandleProps } >
+															{!page.isActive && <PageCard page={ page } pages={ page } setPages={ setPages }
+																key={ `${page.id.toString()}${i}` } />}
+														</div>
+													)
+												} }
+											</Draggable> 
+										}
+										) } 
+								{provided.placeholder}
+									</div> 
+								) 
+							} }
+						</Droppable> 
+					</DragDropContext>
 				</div>
+			</div>
 
-			{/*Red area for inactive pages */}
-				<div className="dragArea--inactive" style={{backgroundColor:"rgba(255, 0, 0, 0.15)", borderRadius:"10px",
-					flexWrap: "wrap", margin:"15px",display: "flex",justifyContent:"center",minHeight:"500px",minWidth:"500px"}}>
-					{ filteredResults && filteredResults.map((page, i) => 
-						!page.isActive && <PageCard page={page} pages={page} setPages={setPages} key={ `${page.title}${i}` } />
-					) }
-				</div> 
-			</div> 
-	</div>
-
-			<Route path="/admin/new"> {/*add new page */}
-					<NewOverlay setPages={setPages} /> 
+			<Route path="/admin/new"> {/*add new page */ }
+				<NewOverlay setPages={ setPages } />
 			</Route>
 
-			<Route path="/admin/:id"> {/*view / edit page*/}
+			<Route path="/admin/:id"> {/*view / edit page*/ }
 				{
 					pages && focusedPageID &&
-					<PageOverlay page={ pages.filter((page) => page.id === focusedPageID)[0] }
-						pages={pages} setPages={setPages}
+					<PageOverlay page={ pages.filter((page) => page.id === focusedPageID)[ 0 ] }
+						pages={ pages } setPages={ setPages }
 					/>
 				}
 			</Route>

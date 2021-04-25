@@ -22,7 +22,7 @@ const history = useHistory()
 					try{
 						const deletedID=await deletePage(page.id) 
 						console.log(deletedID)
-						setPages(pages.filter((page)=>page.id!==deletedID))
+						setPages(pages.filter((page)=>page.id!==parseInt(deletedID)))
 					}
 					catch{
 						console.log("Something went wrong")
