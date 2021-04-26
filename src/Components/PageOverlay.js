@@ -1,93 +1,95 @@
-import {useHistory} from "react-router-dom"
-import {useState} from "react"
+import { useHistory } from "react-router-dom"
+import { useState } from "react"
 import OverlayAttribute from "./OverlayAttribute"
-import {AiOutlineCloseCircle} from "react-icons/ai"
-import {AiOutlineEdit} from "react-icons/ai"
-import {BiSave} from "react-icons/bi" 
-import {updatePage} from '../API_calls/calls' 
+import DecorativeLines from "./DecorativeLines"
+import { AiOutlineCloseCircle } from "react-icons/ai"
+import { AiOutlineEdit } from "react-icons/ai"
+import { updatePage } from '../API_calls/calls'
+import { typeNumToString, typeStringToNum } from '../Functions/utility'
 
-const PageOverlay=({page,pages,setPages})=>{
-	const history=useHistory() 
-	const [isEditable,setIsEditable]=useState(false) 
+const PageOverlay = ({ page, pages, setPages }) => {
+	const history = useHistory()
+	const [ isEditable, setIsEditable ] = useState(false) 
+	const [ editedPage, setEditedPage ] = useState({ ...page, type: typeNumToString(page.type) })
+	//updated values to be sent if edited. PageType will be stored as a meaningful string for display purposes if not editing.
 
-	//TODO refactor and import to both overlays
-	const typeNumToString=(typeNum)=>{ // get meaning of enum 
-		switch (typeNum){
-			case 0:
-				return "Menu"
-		  case 1:
-				return "Events"
-			default:
-				return "Content" 
-		} 
-	}
-
-	const typeStringToNum=(typeString)=>{ // switch back to enum 
-		console.log(typeString)
-		switch (typeString){
-			case "Menu":
-				return 0 
-		  case "Events":
-				return 1	
-			case "Content":
-        return 3
-			default:
-				return false   //something went wrong
-		} 
-	}
-
-	//updated values to be sent if edited. PageType will be stored as a meaningful string, and switched back to 0-2 on submission
-	const [editedPage,setEditedPage]=useState({...page,type:typeNumToString(page.type)}) 
-
-	return page 
+	return page
 		? (
-			<div style ={{borderRadius:"8px",border:"1px solid #6272a4",opacity:"0.9",backgroundColor:"#000000",
-			position:"absolute", display:"flex",
-			top:"0px",bottom:"0px",left:"0px",right:"0px",
-			margin:"60px 200px 60px 200px",
-			zIndex:"1" 
-			}}>
-			{isEditable
-						?
-						editedPage && 
-				<div style ={{display:"flex", flexDirection:"column"}}>
-					<input style={{color:"black"}}value={editedPage.title} onChange={(event)=>{
-						setEditedPage({...editedPage,title:event.target.value})}}/>
-					<input style={{color:"black"}}value={editedPage.description} onChange={(event)=>{
-						setEditedPage({...editedPage,description:event.target.value})}}/>  {/**TODO enforce restrictions*/}
-					<input style={{color:"black"}}value={editedPage.type} onChange={(event)=>{
-						setEditedPage({...editedPage,type:event.target.value})}}/>
-
-					<BiSave 
-						onClick={async()=>{
-							try{ 
-								const updatedPage=await updatePage({...editedPage,type:typeStringToNum(editedPage.type)}) 
-								setPages(pages.filter((page)=>page.id!==updatedPage.id).concat(updatedPage)) //remove old page, add updated
-							} 
-							catch{
-								console.log("something failed")  //TODO notification
-						}
-							}}
-						/>
-
+			<div className="formContainer">
+				<div className={ "form__title" }>
+					<h3 style={ { marginLeft: "20px", whiteSpace: "normal", overflow: "hidden", textOverflow: "ellipsis" } }>{ page.title }</h3>
+					<AiOutlineEdit size={ "30" } style={ { marginLeft: "auto", marginRight: "15px", alignSelf: "flex-end", color: "white" } }
+						onClick={ () => { setIsEditable(!isEditable) } } />
+					<AiOutlineCloseCircle size={ "30px" }
+						style={ { justifySelf: "flex-end", alignSelf: "flex-end", marginTop: "5px", } }
+						onClick={ () => { history.push("/admin") } } />   {/*TODO wrap in button for accessibility */ }
 				</div>
-						:
-				<div style ={{display:"flex", flexDirection:"column"}}>
-					<OverlayAttribute attribute={"title"} value ={page.title}/>
-					<OverlayAttribute attribute={"description"} value ={page.description}/>
-					<OverlayAttribute attribute={"active"} value ={page.active}/>
-					<OverlayAttribute attribute={"published on"} value ={page.publishedOn}/>
-					<OverlayAttribute attribute={"type"} value ={typeNumToString(page.type)}/>
-				</div>
+				{ isEditable
+					?
+					editedPage &&
+					<div className="form__content" style={ { paddingTop: "20px", flexGrow: "1", display: "flex", flexDirection: "column" } }>
+						<h2 className="form__label">Title</h2>
+						<input className="form__input--text" placeholder="Title" value={ editedPage.title } onChange={ (event) =>
+						{
+							setEditedPage({ ...editedPage, title: event.target.value })
+						} } />
+						<h2 className="form__label" style={ { marginTop: "10px" } }>Description</h2>
+						<textarea className="form__input--text" style={ { height: "80px" } } placeholder="Description" value={ editedPage.description } onChange={ (event) =>
+						{
+							setEditedPage({ ...editedPage, description: event.target.value })
+						} } />  {/**TODO enforce restrictions*/ }
+
+						<h2 className={ "form__label" } style={ { marginTop: "30px", marginBottom: "10px" } }>Type</h2>
+						<form className={ "radioForm" }>
+							<div className="radioContainer" >
+								<input type="radio" value="0" id="Menu"
+									defaultChecked={ editedPage.type === "0" || editedPage.type === "Menu" }
+									onChange={ (e) => { setEditedPage({ ...editedPage, type: e.target.value }) } } name="Type" />
+								<label className={ "radio__label" }>Menu</label>
+							</div>
+
+							<div className="radioContainer" >
+								<input type="radio" value="1" id="Events"
+									defaultChecked={ editedPage.type === "1" || editedPage.type === "Events" }
+									onChange={ (e) => { setEditedPage({ ...editedPage, type: e.target.value }) } } name="Type" />
+								<label className={ "radio__label" }>Events</label>
+							</div>
+
+							<div className="radioContainer">
+								<input type="radio" value="2" id="Content"
+									defaultChecked={ editedPage.type === "2" || editedPage.type === "Content" }
+									onChange={ (e) => { setEditedPage({ ...editedPage, type: e.target.value }) } } name="Type" />
+								<label className={ "radio__label" }>Content</label>
+							</div>
+						</form>
+
+						<button style={ { marginTop: "20px" } } className="saveButton"
+							onClick={ async () =>
+							{
+								try {
+									const updatedPage = await updatePage({ ...editedPage, type: typeStringToNum(editedPage.type) })
+									setPages(pages.filter((page) => page.id !== updatedPage.id).concat(updatedPage)) //remove old page, add updated
+								}
+								catch{
+									console.log("something failed")  //TODO notification
+								}
+							}}>
+							Save
+							</button>
+						<DecorativeLines />
+
+					</div>
+					:
+					<div className={ "form__content" } style={ { paddingTop: "20px" } }>
+						<OverlayAttribute attribute={ "Title" } value={ page.title } />
+						<OverlayAttribute attribute={ "Description" } value={ page.description } />
+						<OverlayAttribute attribute={ "Published on" } value={ page.publishedOn } />
+						<OverlayAttribute attribute={ "Type" } value={ typeNumToString(page.type) } />
+						<DecorativeLines />
+					</div>
 				}
-				<div style={{display:"flex", flexDirection:"column"}}>
-					<AiOutlineCloseCircle 
-						onClick={()=>{history.push("/admin")}}/>   {/*TODO wrap in button for accessibility */}
-					<AiOutlineEdit style={{color:"white"}} 
-						onClick={()=>{setIsEditable(!isEditable)}} />
 			</div>
-			</div>
-			) 
+		)
 		: (null) /*invalid url parameter*/
 }
 

@@ -1,46 +1,70 @@
-import {useHistory} from "react-router-dom"
-import {useState} from "react"
-import {AiOutlineCloseCircle} from "react-icons/ai"
-import {BiSave} from "react-icons/bi" 
-import {postPage} from '../API_calls/calls' 
+import { useHistory } from "react-router-dom"
+import { useState } from "react"
+import { AiOutlineCloseCircle } from "react-icons/ai"
+import { postPage } from '../API_calls/calls'
 
-const NewOverlay=({page,pages,setPages})=>{
-	const history=useHistory() 
-	const [newPage,setNewPage]=useState({title:"",description:"",type:0,})
+const NewOverlay = ({ pages, setPages }) =>
+{
+	const history = useHistory()
+	const [ newPage, setNewPage ] = useState({ title: "", description: "", type: null })
 
-	return  (
-			<div style ={{borderRadius:"8px",border:"1px solid #6272a4",opacity:"0.9",backgroundColor:"#000000",
-			position:"absolute", display:"flex",
-			top:"0px",bottom:"0px",left:"0px",right:"0px",
-			margin:"60px 200px 60px 200px",
-			zIndex:"1" 
-			}}>
-				<div style ={{display:"flex", flexDirection:"column"}}>
-					<input style={{color:"black"}}value={newPage.title} onChange={(event)=>{
-						setNewPage({...newPage,title:event.target.value})}}/>
-					<input style={{color:"black"}}value={newPage.description} onChange={(event)=>{
-						setNewPage({...newPage,description:event.target.value})}}/>  {/**TODO enforce restrictions*/}
-					<input style={{color:"black"}}value={newPage.type} onChange={(event)=>{
-						setNewPage({...newPage,type:event.target.value})}}/> 
-					<BiSave 
-						onClick={async()=>{
-							try{ 
-								const updatedPage=await postPage({...newPage,type:0})/*TODO fix type, extract function from other overlay*/
-								setPages(pages.concat(updatedPage)) // add updated TODO internal server error...
-							} 
-							catch{
-								console.log("something failed")  //TODO notification
+	return (
+		<div className="formContainer">
+			<div className={ "form__title" }>
+				<h3 style={ { marginLeft: "20px", whiteSpace: "normal", overflow: "hidden", textOverflow: "ellipsis" } }>New Page</h3>
+				<AiOutlineCloseCircle size={"30px"}
+					style={ { marginLeft: "auto", marginRight: "15px", justifySelf: "flex-end", alignSelf: "flex-end", marginTop: "5px", } }
+					onClick={() => { history.push("/admin") }} />   {/*TODO wrap in button for accessibility */ }
+			</div>
+
+			<div className={ "form__content" } style={ { paddingTop: "10px" } }>
+				<input className={ "form__input--text" } placeholder={ "Title" } value={ newPage.title }
+					onChange={ (event) => { setNewPage({ ...newPage, title: event.target.value }) } } />
+				<textarea className={ "form__input--text" } style={ { height: "80px" } } placeholder={ "Description" } value={ newPage.description }
+					onChange={ (event) => { setNewPage({ ...newPage, description: event.target.value }) } } />  {/**TODO enforce restrictions*/ }
+
+				<h2 className={ "form__label" } style={ { marginTop: "20px", marginBottom: "10px", } }>Type</h2>
+				<form className={ "radioForm" } >
+					<div className="radioContainer" >
+						<input type="radio" value="0" id="Menu"
+							onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
+						<label className={ "radio__label" }>Menu</label>
+					</div>
+
+					<div className="radioContainer" >
+						<input type="radio" value="1" id="Events"
+							onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
+						<label className={ "radio__label" }>Events</label>
+					</div>
+
+					<div className="radioContainer">
+						<input type="radio" value="2" id="Content"
+							onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
+						<label className={ "radio__label" }>Content</label>
+					</div>
+				</form>
+
+				<button
+					className="saveButton"
+					onClick={ async () =>
+					{
+						if (!newPage.type || !newPage.title || !newPage.description) {
+							console.log("Please provide all requested information")  // TODO notification
+							return
 						}
-							}}
-						/> 
-				</div>
-				
-				<div style={{display:"flex", flexDirection:"column"}}>
-					<AiOutlineCloseCircle 
-						onClick={()=>{history.push("/admin")}}/>   {/*TODO wrap in button for accessibility */}
+						try {
+							const updatedPage = await postPage({ ...newPage, type: parseInt(newPage.type) })/*TODO fix type, extract function from other overlay*/
+							setPages(pages.concat(updatedPage)) // add updated TODO internal server error...
+						}
+						catch{
+							console.log("something failed")  //TODO notification
+						}
+					} }>
+					save
+					</button>
 			</div>
-			</div>
-			) 
+		</div>
+	)
 }
 
 export default NewOverlay

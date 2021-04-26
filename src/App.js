@@ -1,6 +1,5 @@
 import {useState,useEffect} from "react"
 import {Route} from "react-router-dom"; 
-import Banner from './Components/Banner'
 import Home from './Pages/Home'
 import AdminCenter from './Pages/AdminCenter' 
 import {getPages} from './API_calls/calls' 
@@ -18,7 +17,6 @@ function App() {
 
   return (
     <div className="App">
-			<Banner username="Ioannis"/>
 			<Route exact path="/"> 
 				<Home pages={pages}/>
 			</Route>
