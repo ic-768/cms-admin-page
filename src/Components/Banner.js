@@ -9,26 +9,26 @@ const Banner = ({ filterQuery, setFilterQuery, username }) =>
 {
 
 	return (
-		<div className="Banner">
+		<div className="banner">
 			<div style={ { width: "70%" } }>
 				<h3 style={ { justifySelf: "center" } }>Admin Dashboard</h3>
 			</div>
-			<div style={ { alignItems: "center", height: "100%", marginLeft: "auto", marginRight: "20px", display: "flex" } }>
+			<div className="banner__iconContainer">
 				<Link style={ { height: "100%" } } to="/admin/new">
-					<BiAddToQueue className="Banner__icon" size={ "40px" } />
+					<BiAddToQueue className="banner__icon" size={ "40px" } />
 				</Link>
 				<div style={ { height: "100%" } } className="dropdown">
-					<BsSearch className="Banner__icon dropbtn" size={ "30px" } /> {/*TODO not sure how to make this accessible without mouse*/ }
+					<BsSearch className="banner__icon dropbtn" size={ "30px" } /> {/*TODO not sure how to make this accessible without mouse*/ }
 					<div className="dropdown-content">
-						<input style={ { height: "25px", margin: "5px", color: "black" } }
+						<input style={ { marginTop: "-1px" } }
 							placeholder={ "Filter" }
 							value={ filterQuery }
 							onChange={ (event) => { setFilterQuery(event.target.value) } } />
 					</div>
 				</div>
-				<GoFlame className="Banner__icon" size={ "30px" } />
-				<BsGraphUp className="Banner__icon" size={ "30px" } />
-				<FiUser className="Banner__icon" size={ "30px" } />
+				<GoFlame className="banner__icon" size={ "30px" } />
+				<BsGraphUp className="banner__icon" size={ "30px" } />
+				<FiUser className="banner__icon" size={ "30px" } />
 				<h3 style={ { marginLeft: "20px" } }>
 					{ username }
 				</h3>

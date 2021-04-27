@@ -11,7 +11,7 @@ backgroundSize:"cover",backgroundRepeat:"noRepeat",
 				flexDirection:"column",
 				alignItems:"center",
 				justifyContent:"center" }} > 
-					<button className="EntryButton" 
+					<button className="entryButton" 
 						onClick={()=>{history.push("/admin")}}> 
 						<h1 className="entryButton__contents">
 						{pages && pages.length}

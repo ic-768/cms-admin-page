@@ -14,38 +14,38 @@ droppableIds will either be "active" or "inactive" */
 		: "2px dashed gray"
 
 	return (
-		<Droppable droppableId={ droppableId }>
-			{ (provided, snapshot) =>
-			{
-				return (
-					<div className="dragArea" style={ { border: snapshot.isDraggingOver
-							? activeBorderColor
-							: inactiveBorderColor,
-					} }
-						{ ...provided.droppableProps }
-						ref={ provided.innerRef }
+		<Droppable droppableId={droppableId}>
+			{(provided, snapshot) => 
+				<div className="dragArea" style={{
+					border: snapshot.isDraggingOver
+						? activeBorderColor
+						: inactiveBorderColor,
+				}}
+						{...provided.droppableProps}
+						ref={provided.innerRef}
 					>
-						{ filteredResults && filteredResults.map((page, i) =>  //for each page, create a draggable pagecard
+						{filteredResults && filteredResults.map((page, i) =>  //for each page, create a draggable pagecard
 						//TODO there's definitely a way to optimise the sorting - now it's just iterating over ALL pages TWICE
-							<Draggable key={ page.id.toString() } draggableId={ `${page.id.toString()} ${droppableId}` } index={ i }>
+							<Draggable key={page.id.toString()} draggableId={`${page.id.toString()} ${droppableId}`} index={i}>
 								{ (provided) =>
 									<div
 										ref={ provided.innerRef }
 										{ ...provided.draggableProps }
 										{ ...provided.dragHandleProps } >
 										{ droppableId === "active" && page.isActive && 
-										<PageCard setNotification={setNotification} page={ page } pages={ pages } setPages={ setPages }
-											key={ `${page.id.toString()}${i}` } /> }
-										{ droppableId === "inactive" && !page.isActive && 
-										<PageCard setNotification={setNotification} page={ page } pages={ pages } setPages={ setPages }
-											key={ `${page.id.toString()}${i}` } /> }
+											<PageCard setNotification={setNotification} page={page} pages={pages} setPages={setPages}
+												key={ `${page.id.toString()}${i}` } /> }
+										{ droppableId === "inactive" && !page.isActive &&
+											<PageCard setNotification={setNotification} page={page} pages={pages} setPages={setPages}
+												key={ `${page.id.toString()}${i}` } 
+											/> }
 									</div>
 								}
 							</Draggable>
 						)}
 						{ provided.placeholder }
 					</div>
-				)}}
+				}
 		</Droppable> 
 	)
 } 

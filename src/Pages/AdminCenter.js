@@ -48,8 +48,7 @@ const AdminCenter = ({ setPages, pages }) => {
 			<div className="PageContainer" style={{ 
 				backgroundImage:`url(${backgroundImage})`, 
 				}}>
-					<div className="dropZoneRow"style={ { width:"100%",display: "flex",justifyContent:"center" } }> 
-
+					<div className="dropZoneRow"> 
 						<DragDropContext //context for drag interactions
 							onDragEnd={ async (result) => 
 							{
@@ -81,14 +80,16 @@ const AdminCenter = ({ setPages, pages }) => {
 							} }> 
 
 							{/*two droppable areas - toggle active or inactive page */}
-							<div style={{marginLeft:"15px",display:"flex",flexDirection:"column",width:"50%",marginTop:"100px"}}>
-								<h2 style={{marginRight:"auto"}}>Active pages</h2>
-							<DropZone setNotification={setNotification} droppableId={"active"} pages={pages} setPages={setPages} filteredResults={filteredResults}/>
-							</div> 
-							<div style={{marginRight:"15px",marginLeft:"10px",display:"flex",flexDirection:"column",width:"50%",marginTop:"100px"}}>
-								<h2 style={{marginRight:"auto"}}>Inactive pages</h2>
-							<DropZone setNotification={setNotification} droppableId={"inactive"} pages={pages} setPages={setPages} filteredResults={filteredResults}/> 
-							</div>
+						<div className="dropZoneContainer">
+							<h2 style={ { marginRight: "auto" } }>Active pages</h2>
+							<DropZone setNotification={ setNotification } droppableId={ "active" } pages={ pages }
+								setPages={ setPages } filteredResults={ filteredResults } />
+						</div>
+						<div className="dropZoneContainer">
+							<h2 style={ { marginRight: "auto" } }>Inactive pages</h2>
+							<DropZone setNotification={ setNotification } droppableId={ "inactive" } pages={ pages }
+								setPages={ setPages } filteredResults={ filteredResults } />
+						</div>
 						</DragDropContext>
 					</div>
 
@@ -97,12 +98,10 @@ const AdminCenter = ({ setPages, pages }) => {
 				</Route>
 
 				<Route path="/admin/:id"> {/*view / edit page*/ }
-					{
-						pages && focusedPageID &&
-						<PageOverlay setNotification={setNotification} page={ pages.filter((page) => page.id === focusedPageID)[ 0 ] }
+					{ pages && focusedPageID &&
+						<PageOverlay setNotification={setNotification} page={ pages.filter((page) => page.id === focusedPageID)[ 0 ] } //find focused page by id
 							pages={ pages } setPages={ setPages }
-						/>
-					}
+						/> }
 				</Route>
 			</div>
 		</>

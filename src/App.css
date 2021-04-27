@@ -23,6 +23,10 @@
   100% {opacity: 100%;}
 }
 
+@keyframes shadowExpand {
+  0%   { box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1); }
+  100% { box-shadow: 1px 0px 1px 40px var(--blue); }
+} 
 
 input{
 	font-size:18px; 
@@ -39,22 +43,30 @@ textarea{
 	height:100vh;
 	text-align: center;
 }
-.Banner{
+
+.banner{
 	display:flex;
 	height:40px;
 	background-color: var(--blue);
 	align-items:center;
 }
 
-.Banner__icon{
+.banner__iconContainer{
+  align-items: center;
+	height: 100%;
+	margin-left: auto;
+	margin-right: 20px;
+	display: flex; 
+}
+
+.banner__icon{
 	height:100%;
 	padding-right:30px;
 	padding-left:30px;
 }
 
-.Banner__icon:hover{
-	background-color:var(--purple--light);
-
+.banner__icon:hover{
+	background-color:var(--purple--light); 
 }
 
 .PageContainer{ 
@@ -65,7 +77,7 @@ textarea{
 	background-repeat:no-repeat; 
 }
 
-.EntryButton{
+.entryButton{
 	display: inline-block;
 	position: relative;
 	text-decoration: none;
@@ -90,11 +102,30 @@ textarea{
 	font-size: 40px;
 	background-image: -webkit-linear-gradient(#e8e8e8 0%, #000000 100%);
 	background-image: linear-gradient(#b6b6b6 0%, var(--background) 100%);
-	text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.66);
 	box-shadow: inset 0 2px 0 rgba(255,255,255,0.5), 0 2px 2px rgba(0, 0, 0, 0.19);
 	border-bottom: solid 2px #b5b5b5;
 	display:flex;
 	align-items:center;
+	justify-content:center; 
+}
+
+.entryButton:hover{
+	animation:shadowExpand;
+	animation-duration:1s; 
+	animation-fill-mode: forwards;  
+} 
+
+.dropZoneContainer{
+	margin-right:15px;
+	margin-left:10px;
+	display:flex;
+	flex-direction:column;
+	width:50%;
+	margin-top:50px; 
+}
+.dropZoneRow{
+  width:100%;
+	display: flex;
 	justify-content:center; 
 }
 
@@ -105,7 +136,7 @@ textarea{
  	display: flex; 
 	 border-radius: 10px;
 	 margin-top:10px;
-	height:70vh;
+	height:75vh;
 	justify-content: center;
 	overflow-y:auto;
 }
@@ -162,7 +193,6 @@ textarea{
   display:flex;
 	flex-direction:column;
   border-radius:8px;
-	border:1px solid var(--blue);
   z-index:1;
 	position:absolute;
 	top:0px;
@@ -187,6 +217,7 @@ textarea{
 }
 
 .form__content--view{
+	border:1px solid black;
 	height:100%;
 	overflow-y:auto;
   display: flex;
@@ -196,6 +227,7 @@ textarea{
 }
 
 .form__content--edit{
+	border:1px solid black;
 	height:100%;
 	overflow-y:auto;
   display: flex;
@@ -205,6 +237,7 @@ textarea{
 }
 
 .form__content--new{
+	border:1px solid black;
 	height:700px;
   display: flex;
 	flex-direction: column; 
@@ -245,6 +278,14 @@ textarea{
   color: black;
   margin: 15px;
   margin-bottom: 2px;
+}
+.attributeContainer{
+  margin-top: 20px;
+	margin-bottom: 20px;
+	flex-grow: 1;
+	overflow-wrap: anywhere;
+	background-color: #44475a;
+
 }
  
 .radioContainer{
@@ -299,7 +340,7 @@ textarea{
 
 }
 
-/**Media Queries*//
+/**Media Queries*/
 @media screen and (max-width: 650px) {
 	.EntryButton{
 	 font-size:small;
@@ -312,8 +353,7 @@ textarea{
 .form__content--new{
 	height:670px;
  } 
-}
-
+} 
 
 /**Calendar **/
 

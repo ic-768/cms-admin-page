@@ -1,8 +1,6 @@
 import axios from "axios"
 const baseUrl="https://pagesmanagement.azurewebsites.net/api/ResponsivePages"
 
-//TODO Turn all catch blocks into notifications
-
 	const config={
 		headers:{ "Content-Type": "application/json" }
 	}
@@ -13,7 +11,7 @@ export const getPages=async()=>{
 		return response.data 
 	}
 	catch{
-		console.log("Error on api call") 
+		return null
 	}
 } 
 
@@ -24,7 +22,7 @@ export const updatePage=async(page)=>{
 		return response.data
 	}
 	catch{ 
-		console.log("Error on api call") 
+		return null
 	} 
 }
 
@@ -34,7 +32,7 @@ export const postPage=async(page)=>{
 		return response.data
 	}
 	catch{ 
-		console.log("Error on api call") 
+		return null
 	} 
 }
 
@@ -44,6 +42,6 @@ export const deletePage=async(id)=>{
 		return result.data.id 
 	}
 	catch{
-		console.log("Error on api call") 
+		return null
 	}
 }
