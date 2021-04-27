@@ -1,45 +1,57 @@
-import { useHistory } from "react-router-dom"
-import { useState } from "react"
-import OverlayAttribute from "./OverlayAttribute"
+import { useHistory,Link } from "react-router-dom"
+import { useState,useEffect } from "react"
+import Calendar from "react-calendar"
 import DecorativeLines from "./DecorativeLines"
 import { AiOutlineCloseCircle } from "react-icons/ai"
 import { AiOutlineEdit } from "react-icons/ai"
-import { updatePage } from '../API_calls/calls'
+import { updatePage } from '../Functions/api_calls'
 import { typeNumToString, typeStringToNum } from '../Functions/utility'
 
-const PageOverlay = ({ page, pages, setPages }) => {
+const PageOverlay = ({ setNotification,page, pages, setPages }) => {
 	const history = useHistory()
 	const [ isEditable, setIsEditable ] = useState(false) 
-	const [ editedPage, setEditedPage ] = useState({ ...page, type: typeNumToString(page.type) })
-	//updated values to be sent if edited. PageType will be stored as a meaningful string for display purposes if not editing.
+
+	//updated values to be sent if edited. PageType will be stored as a meaningful string for display purposes if not editing. 
+	const [ editedPage, setEditedPage ] = useState(page ?{ ...page, type: typeNumToString(page.type) }:null)
+	const [deploymentDate,setDeploymentDate]=useState(new Date());
+
+	useEffect(()=>{
+		setEditedPage({...editedPage,publishedOn:deploymentDate}) 
+	},[deploymentDate])
 
 	return page
 		? (
-			<div className="formContainer">
+			<div style={{width:isEditable?"700px":"300px"}}className="formContainer">
 				<div className={ "form__title" }>
 					<h3 style={ { marginLeft: "20px", whiteSpace: "normal", overflow: "hidden", textOverflow: "ellipsis" } }>{ page.title }</h3>
-					<AiOutlineEdit size={ "30" } style={ { marginLeft: "auto", marginRight: "15px", alignSelf: "flex-end", color: "white" } }
-						onClick={ () => { setIsEditable(!isEditable) } } />
-					<AiOutlineCloseCircle size={ "30px" }
-						style={ { justifySelf: "flex-end", alignSelf: "flex-end", marginTop: "5px", } }
-						onClick={ () => { history.push("/admin") } } />   {/*TODO wrap in button for accessibility */ }
+
+					<Link style={ { marginLeft: "auto", marginRight: "15px", alignSelf: "flex-end", color: "white" } }
+						onClick={ () => { setIsEditable(!isEditable) } } >
+						<AiOutlineEdit size={ "30" } />
+					</Link>
+
+					<Link style={ { justifySelf: "flex-end", alignSelf: "flex-end", marginTop: "5px", } } to="/admin" >
+					<AiOutlineCloseCircle size={ "30px" }/>
+					</Link>
 				</div>
 				{ isEditable
 					?
 					editedPage &&
-					<div className="form__content" style={ { paddingTop: "20px", flexGrow: "1", display: "flex", flexDirection: "column" } }>
-						<h2 className="form__label">Title</h2>
-						<input className="form__input--text" placeholder="Title" value={ editedPage.title } onChange={ (event) =>
+					<div className="form__content--edit" style={ { paddingTop: "20px", flexGrow: "1", display: "flex", flexDirection: "column" } }>
+						<h2 className="form__label--left">Title *</h2>
+						<input maxLength="50" className="form__input--text" placeholder="Title (max 50 chars)" value={ editedPage.title } onChange={ (event) =>
 						{
 							setEditedPage({ ...editedPage, title: event.target.value })
 						} } />
-						<h2 className="form__label" style={ { marginTop: "10px" } }>Description</h2>
-						<textarea className="form__input--text" style={ { height: "80px" } } placeholder="Description" value={ editedPage.description } onChange={ (event) =>
+						<h2 className="form__label--left" style={ { marginTop: "10px" } }>Description</h2>
+						<div style={{width:"100%"}}>
+						<textarea className="form__input--text" maxLength="200"style={ { height: "80px" } } placeholder="Description (max 200 chars)" value={ editedPage.description } onChange={ (event) =>
 						{
 							setEditedPage({ ...editedPage, description: event.target.value })
-						} } />  {/**TODO enforce restrictions*/ }
+						} } /> 
+						</div>
 
-						<h2 className={ "form__label" } style={ { marginTop: "30px", marginBottom: "10px" } }>Type</h2>
+						<h2 className={ "form__label--center" } style={ { marginTop: "10px", marginBottom: "10px" } }>Type *</h2>
 						<form className={ "radioForm" }>
 							<div className="radioContainer" >
 								<input type="radio" value="0" id="Menu"
@@ -62,35 +74,63 @@ const PageOverlay = ({ page, pages, setPages }) => {
 								<label className={ "radio__label" }>Content</label>
 							</div>
 						</form>
-
+						{!page.isActive &&   //allow changing publishing date if inactive 
+						<>
+							<h2 className={ "form__label--center" } style={{ marginTop: "10px", marginBottom: "10px" } }>Publish on *</h2> 
+							<Calendar value={deploymentDate} onChange={setDeploymentDate}/>
+						</>
+						}
+						{console.log(page.title,page.type,page.publishedOn)}
 						<button style={ { marginTop: "20px" } } className="saveButton"
 							onClick={ async () =>
 							{
+								if(!editedPage.title||editedPage.type==null||!editedPage.publishedOn||!editedPage.type){
+									setNotification({message:"Please provide all required fields",color:"red"})
+									return 
+								}
 								try {
 									const updatedPage = await updatePage({ ...editedPage, type: typeStringToNum(editedPage.type) })
 									setPages(pages.filter((page) => page.id !== updatedPage.id).concat(updatedPage)) //remove old page, add updated
+									setNotification({message:"Changes saved successfully",color:"white"})
+									history.push("/admin")
 								}
 								catch{
-									console.log("something failed")  //TODO notification
+									setNotification({message:"Something went wrong",color:"red"})
 								}
 							}}>
 							Save
 							</button>
-						<DecorativeLines />
-
+						<DecorativeLines /> 
 					</div>
 					:
-					<div className={ "form__content" } style={ { paddingTop: "20px" } }>
-						<OverlayAttribute attribute={ "Title" } value={ page.title } />
-						<OverlayAttribute attribute={ "Description" } value={ page.description } />
-						<OverlayAttribute attribute={ "Published on" } value={ page.publishedOn } />
-						<OverlayAttribute attribute={ "Type" } value={ typeNumToString(page.type) } />
+					<div className={ "form__content--view" } style={ { paddingTop: "20px" } }>
+
+						<div style={ { marginBottom: "20px", flexGrow: "1", overflowWrap: "anywhere", backgroundColor: "#44475a", } }>
+							<h2 style={ { width: "100%" } } className={ "form__label--center" }>Title</h2>
+							<h3> { page.title } </h3>
+						</div>
+
+						{ page.description && <div style={ { marginTop: "20px", marginBottom: "20px", flexGrow: "1", overflowWrap: "anywhere", backgroundColor: "#44475a", } }>
+							<h2 style={ { width: "100%" } } className={ "form__label--center" }>Description</h2>
+							<h3> { page.description } </h3>
+						</div> }
+
+						<div style={ { marginTop: "20px", marginBottom: "20px", flexGrow: "1", overflowWrap: "anywhere", backgroundColor: "#44475a", } }>
+							<h2 style={ { width: "100%" } } className={ "form__label--center" }>Published on</h2>
+							<h3> { page.publishedOn.replace(/T/," at ") } </h3> {/*human-readable*/}
+						</div>
+
+						<div style={ { marginTop: "20px", marginBottom: "20px", flexGrow: "1", overflowWrap: "anywhere", backgroundColor: "#44475a", } }>
+							<h2 style={ { width: "100%" } } className={ "form__label--center" }>Type</h2>
+							<h3> { typeNumToString(page.type) } </h3>
+						</div>
+
 						<DecorativeLines />
 					</div>
 				}
 			</div>
 		)
-		: (null) /*invalid url parameter*/
+		: (null) //invalid url parameter
 }
 
 export default PageOverlay

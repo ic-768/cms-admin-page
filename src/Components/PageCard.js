@@ -1,35 +1,41 @@
 import CardAttribute from "./CardAttribute"
 import { GoTrashcan } from "react-icons/go"
 import { BsFillEyeFill } from "react-icons/bs"
-import { deletePage } from "../API_calls/calls"
-import { useHistory } from "react-router-dom"
+import { deletePage } from "../Functions/api_calls"
+import {Link } from "react-router-dom"
 
-const PageCard = ({ page, pages, setPages }) =>
+const PageCard = ({ setNotification, page, pages, setPages }) =>
 {
 	const activeColor = page.isActive ? "#44475A" : "#777777"
-	const history = useHistory()
+	const opacity = page.isActive ? "1" : "0.65"
 	return (
-		<div style={{backgroundColor:activeColor } }
+		<div style={ { backgroundColor: activeColor, opacity: opacity } }
 			className="pageCard">
-			<CardAttribute activity={ page.isActive } attribute={ "Title" } value={ page.title } />
-			<CardAttribute activity={ page.isActive } attribute={ "Published" } value={ page.publishedOn.replace(/T.*/, "") } />{/*remove time-too much info*/ }
-			<div style={{backgroundColor: activeColor }}>
-				<BsFillEyeFill style={{ cursor: "pointer", fontSize: "20px", marginRight: "16px" }}	/*TODO wrap icons in buttons to make accessible */
-					onClick={() => { history.push(`/admin/${page.id}`) }}
-				/>
-				<GoTrashcan style={{ cursor: "pointer", fontSize: "20px" }}
-					onClick={ async () =>
-					{
-						try{
+			<div style={ { alignSelf: "center", display: "flex", flexDirection: "column", marginLeft: "16px", marginRight: "16px" } }>
+				<CardAttribute activity={ page.isActive } attribute={ "Title" } value={ page.title } />
+				<CardAttribute activity={ page.isActive } attribute={ "Published" } 
+				value={ page.publishedOn.replace(/T.*/, "") } /> {/*remove time-too much info*/ }
+			</div>
+
+			<div style={ { alignSelf: "center", marginLeft: "auto", 
+				marginRight: "12px", display: "flex", flexDirection: "column", backgroundColor: activeColor } }>
+				<Link to={ `/admin/${page.id}` }>
+					<BsFillEyeFill style={ { cursor: "pointer", fontSize: "20px", marginBottom: "20px" } } />
+				</Link>
+				<Link to="/admin" onClick={
+					async () => {
+						try {
 							const deletedID = await deletePage(page.id)
-							setPages(pages.filter((page) => page.id !== parseInt(deletedID)))
+							setPages(pages.filter((page) => page.id !== deletedID))
+							setNotification({ message: "Page deleted successfully", color: "white" })
 						}
 						catch{
-							console.log("Something went wrong") // TODO turn into notification
+							setNotification({ message: "Something went wrong", color: "red" }) 
 						}
-					}}
-
-				/>
+					} 
+				}>
+					<GoTrashcan style={ { cursor: "pointer", fontSize: "20px" } } />
+				</Link>
 			</div>
 		</div>
 	)

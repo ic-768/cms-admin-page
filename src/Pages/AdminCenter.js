@@ -1,25 +1,24 @@
 import { useState, useEffect } from "react"
 import { Route, useLocation } from "react-router-dom"
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
+import { DragDropContext} from "react-beautiful-dnd"
 
-import PageCard from "../Components/PageCard"
+import DropZone from "../Components/DropZone"
 import PageOverlay from "../Components/PageOverlay"
 import NewOverlay from "../Components/NewOverlay"
 import Banner from '../Components/Banner'
-import { updatePage } from "../API_calls/calls"
+import Notification from '../Components/Notification'
+import { updatePage } from "../Functions/api_calls"
 
-const AdminCenter = ({ setPages, pages }) =>
-{ 
+const AdminCenter = ({ setPages, pages }) => { 
 	const [ focusedPageID, setFocusedPageID ] = useState(null) //page to view or edit
 	const [ filterQuery, setFilterQuery ] = useState("")
-	const [ filteredResults, setFilteredResults ] = useState(pages) //which pages to show
+	const [ filteredResults, setFilteredResults ] = useState(pages) //which pages to show 
+	const [notification,setNotification]=useState(null) // if notification to be shown, will be object {message:,color:}
 
 	const currPath = useLocation()
+	const backgroundImage="/bg.jpg"
 
-	console.log(filteredResults)
-
-	useEffect(() =>
-	{ //get ID parameter from url
+	useEffect(() =>{ //get ID parameter from url
 		setFocusedPageID(
 			currPath.pathname.match(/.*\/(\d+)/)
 				? parseInt(currPath.pathname.match(/.*\/(\d+)/)[ 1 ]) || null //
@@ -27,10 +26,16 @@ const AdminCenter = ({ setPages, pages }) =>
 		)
 	}, [ currPath ])
 
-	useEffect(() =>
-	{
-		pages && setFilteredResults(filterPages(pages, filterQuery))// show page only if query contained in the title 
+	useEffect(() =>{
+		pages && setFilteredResults(filterPages(pages, filterQuery))// show page only if search query contained in the title 
 	}, [ pages, filterQuery ])
+
+	useEffect(()=>{ //Turn off notification after 3 sec 		
+		if(notification){ 			
+			setTimeout(() => {
+				setNotification(null)}, 3000)
+		} 	
+	},[notification])
 
 	const filterPages = (pages, query) => // filter by title and description
 		pages.filter((page) => page.title.toLowerCase().includes(query.toLowerCase()) || 
@@ -38,132 +43,63 @@ const AdminCenter = ({ setPages, pages }) =>
 
 	return (
 		<>
+{notification && <Notification message={notification.message} color={notification.color}/>}
 			<Banner filterQuery={ filterQuery } setFilterQuery={ setFilterQuery } username="Ioannis"/> 
-			<div className="PageContainer" style={{ display: "flex"}}>
-				<div className="PageContent"style={ { flexGrow: "1", display: "flex", justifyContent:"center",alignItems: "center", flexDirection: "column" } }>
+			<div className="PageContainer" style={{ 
+				backgroundImage:`url(${backgroundImage})`, 
+				}}>
 					<div className="dropZoneRow"style={ { width:"100%",display: "flex",justifyContent:"center" } }> 
-						<DragDropContext
-							onDragEnd={ async (result) =>
-							{
-								if (!result.destination) { return }  // dragged outside valid areas
-								const draggedId = result.draggableId.match(/\d+/)[ 0 ] // item id
-								const targetPage = pages.filter((page) => page.id === parseInt(draggedId))[ 0 ]
-								const itemActivity = result.draggableId.match(/\d+ (.*)/)[ 1 ] // item currently active or inactive
-								const destActivity = result.destination.droppableId // area dragged to
 
-								if (itemActivity === "active" && destActivity === "inactive")
-								{ // set inactive
-									try
-									{
-										const updatedPage = await updatePage({ ...targetPage, isActive: false })
+						<DragDropContext //context for drag interactions
+							onDragEnd={ async (result) => 
+							{
+								if (!result.destination) {return}  // dragged outside valid areas
+								const draggedId = result.draggableId.match(/\d+/)[ 0 ] // item id
+								const targetPage = pages.filter((page) => page.id === parseInt(draggedId))[ 0 ] //get page by id
+								const itemActivity = result.draggableId.match(/\d+ (.*)/)[ 1 ] // item currently active or inactive
+								const destActivity = result.destination.droppableId // which area item was dragged to
+
+								if (itemActivity === "active" && destActivity === "inactive") { // set inactive
+									try {
+										const updatedPage = await updatePage({ ...targetPage, isActive: false,publishedOn:new Date()}) //TODO doesn't work if same day
 										setPages((pages.filter((page) => page.id !== parseInt(draggedId)).concat(updatedPage)))
 									}
 									catch{
-										console.log("error") // TODO notifications
+										setNotification({message:"Something went wrong",color:"red"})
 									}
 								}
-								else if (itemActivity === "inactive" && destActivity === "active")
-								{ //set active
-									try
-									{
-										const updatedPage = await updatePage({ ...targetPage, isActive: true })
+								else if (itemActivity === "inactive" && destActivity === "active") { //set active
+									try {
+										const updatedPage = await updatePage({ ...targetPage, isActive: true,publishedOn: new Date() })
 										setPages((pages.filter((page) => page.id !== parseInt(draggedId)).concat(updatedPage)))
 									}
 									catch{
-										console.log("error") // TODO notifications
+										setNotification({message:"Something went wrong",color:"red"})
 									}
 								}
 								return
-							} }>
+							} }> 
 
-							{/*area for active pages */ }
-							<Droppable droppableId={ "active" }>
-								{ (provided, snapshot) =>
-								{
-									return (
-										<div className="dragArea--active" style={ {
-											border: snapshot.isDraggingOver 
-											? "1px solid green"
-											: "1px solid white",
-											margin: "15px",
-											flexWrap: "wrap", display: "flex", borderRadius: "10px",
-											minHeight: "500px", width: "45%", justifyContent: "center",
-										} }
-											{ ...provided.droppableProps }
-											ref={ provided.innerRef }
-										>
-											{ filteredResults && filteredResults.map((page, i) => //TODO there's definitely a way to optimise the sorting 
-											{
-												return <Draggable key={ page.id.toString() } draggableId={ `${page.id.toString()} active` } index={ i }>
-													{ (provided) =>
-														<div
-															ref={ provided.innerRef }
-															{ ...provided.draggableProps }
-															{ ...provided.dragHandleProps } >
-															{ page.isActive && <PageCard page={ page } pages={ page } setPages={ setPages }
-																key={ `${page.id.toString()}${i}` } /> }
-														</div>
-													}
-												</Draggable>
-											}
-											) }
-											{ provided.placeholder }
-										</div>
-									)
-								} }
-							</Droppable>
-							{/*area for inactive pages */ }
-
-							<Droppable droppableId={ "inactive" }>
-								{ (provided,snapshot) =>
-								{
-									return (
-										<div className="dragArea--inactive" style={ {
-											border: snapshot.isDraggingOver
-											?"1px solid red"
-											:"1px dashed gray",
-											margin: "15px",
-											flexWrap: "wrap", display: "flex", borderRadius: "10px",
-											minHeight: "500px", width: "45%", justifyContent: "center"
-										} }
-											{ ...provided.droppableProps }
-											ref={ provided.innerRef }
-										>
-											{ filteredResults && filteredResults.map((page, i) =>
-											{//TODO there's definitely a way to optimise the sorting 
-												return <Draggable key={ page.id.toString() } draggableId={ `${page.id.toString()} inactive` } index={ i }>
-													{ (provided) =>
-													{
-														return (
-															<div
-																ref={ provided.innerRef }
-																{ ...provided.draggableProps }
-																{ ...provided.dragHandleProps } >
-																{ !page.isActive && <PageCard page={ page } pages={ page } setPages={ setPages }
-																	key={ `${page.id.toString()}${i}` } /> }
-															</div>
-														)
-													} }
-												</Draggable>
-											}
-											) }
-											{ provided.placeholder }
-										</div>
-									)
-								} }
-							</Droppable>
+							{/*two droppable areas - toggle active or inactive page */}
+							<div style={{marginLeft:"15px",display:"flex",flexDirection:"column",width:"50%",marginTop:"100px"}}>
+								<h2 style={{marginRight:"auto"}}>Active pages</h2>
+							<DropZone setNotification={setNotification} droppableId={"active"} pages={pages} setPages={setPages} filteredResults={filteredResults}/>
+							</div> 
+							<div style={{marginRight:"15px",marginLeft:"10px",display:"flex",flexDirection:"column",width:"50%",marginTop:"100px"}}>
+								<h2 style={{marginRight:"auto"}}>Inactive pages</h2>
+							<DropZone setNotification={setNotification} droppableId={"inactive"} pages={pages} setPages={setPages} filteredResults={filteredResults}/> 
+							</div>
 						</DragDropContext>
 					</div>
-				</div>
 
 				<Route path="/admin/new"> {/*add new page */ }
-					<NewOverlay setPages={ setPages } />
+					<NewOverlay setNotification={setNotification} pages={pages}setPages={ setPages } />
 				</Route>
 
 				<Route path="/admin/:id"> {/*view / edit page*/ }
 					{
 						pages && focusedPageID &&
-						<PageOverlay page={ pages.filter((page) => page.id === focusedPageID)[ 0 ] }
+						<PageOverlay setNotification={setNotification} page={ pages.filter((page) => page.id === focusedPageID)[ 0 ] }
 							pages={ pages } setPages={ setPages }
 						/>
 					}

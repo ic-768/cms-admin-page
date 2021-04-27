@@ -28,7 +28,7 @@ export const updatePage=async(page)=>{
 	} 
 }
 
-export const postPage=async(page)=>{   //!internal server error 24/7
+export const postPage=async(page)=>{
 	try{
 		const response=await axios.post(baseUrl,page)
 		return response.data
@@ -41,7 +41,7 @@ export const postPage=async(page)=>{   //!internal server error 24/7
 export const deletePage=async(id)=>{   
 	try{
 		const result=await axios.delete(`${baseUrl}/${id}`) 
-		return result.id 
+		return result.data.id 
 	}
 	catch{
 		console.log("Error on api call") 

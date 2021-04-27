@@ -1,16 +1,37 @@
-:root{  /*theme colors */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400&display=swap'); 
+
+/**theme colors */
+:root{  
  --orange:#ffb86c;
  --purple--light:#44475A;
  --purple--dark:#282A36;
  --background:#282a36;
- --blue: #6272a4;
+ --blue: #304071;
 }
 
 *{
+	font-family: 'Roboto', sans-serif;
 	color:white;
 	padding:0;
 	margin:0;
 }	
+
+/**Animations*/
+
+@keyframes fadeIn {
+  0%   {opacity: 0%;}
+  100% {opacity: 100%;}
+}
+
+
+input{
+	font-size:18px; 
+	padding:5px;
+}
+textarea{
+	padding:5px;
+	font-size:15px; 
+}
 
 .App {
 	display:flex;
@@ -20,7 +41,7 @@
 }
 .Banner{
 	display:flex;
-	height:60px;
+	height:40px;
 	background-color: var(--blue);
 	align-items:center;
 }
@@ -38,29 +59,60 @@
 
 .PageContainer{ 
 	color:white;
-	background-color:var(--background);
 	flex-grow: 1;
-}
-.EntryButton{
-	background-color: var(--purple--light);
-	height:18vw;
-	width:18vw;
-	border-radius:50%;
-	font-size:xx-large; 
+	display: flex;
+	background-size:cover;
+	background-repeat:no-repeat; 
 }
 
-.sideBar{
-	min-width:265px;
-	background-color:#282a36;
-	border:1px solid white;
-	border-top:none;
+.EntryButton{
+	display: inline-block;
+	position: relative;
+	text-decoration: none;
+	color: rgba(3, 169, 244, 0.54);
+	width: 300px;
+	height: 300px;
+	border-radius: 50%;
+	text-align: center;
+	background: var(--purple--light);
+	box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.08);
+}
+
+.entryButton__contents{
+	position: absolute;
+	width: 180px;
+	height: 180px;
+	line-height: 80px;
+	vertical-align: middle; 
+	left: 58px;
+	top: 56px;
+	border-radius: 50%;
+	font-size: 40px;
+	background-image: -webkit-linear-gradient(#e8e8e8 0%, #000000 100%);
+	background-image: linear-gradient(#b6b6b6 0%, var(--background) 100%);
+	text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.66);
+	box-shadow: inset 0 2px 0 rgba(255,255,255,0.5), 0 2px 2px rgba(0, 0, 0, 0.19);
+	border-bottom: solid 2px #b5b5b5;
 	display:flex;
-	flex-direction:column; 
+	align-items:center;
+	justify-content:center; 
+}
+
+
+.dragArea{
+	background-color:var(--background);
+ 	flex-wrap: wrap;
+ 	display: flex; 
+	 border-radius: 10px;
+	 margin-top:10px;
+	height:70vh;
+	justify-content: center;
+	overflow-y:auto;
 }
 
 .pageCard{
+	box-shadow: 1px 3px 1px 1px rgba(255,255, 255, 0.6);
 	display:flex;
-	flex-direction: column;
 	position:relative;
 	overflow-y:auto;
 	background-color:#44475a;
@@ -68,8 +120,8 @@
 	padding-top:5px;
 	padding-bottom:0px;
 	margin:15px;
-	width:200px;
-	height:120px;
+	width:160px;
+	height:110px;
 	border:1px solid white;
 }
 
@@ -104,24 +156,25 @@
 
 .dropdown:hover .dropdown-content {
   display: block;
-}
-
+} 
 
 .formContainer{
   display:flex;
 	flex-direction:column;
   border-radius:8px;
-  border:1px solid var(--blue);
-  background-color:var(--background);
+	border:1px solid var(--blue);
   z-index:1;
 	position:absolute;
 	top:0px;
 	left:0px;
 	right:0px;
-	width:500px;
+	width:700px;
 	margin-left:auto;
 	margin-right:auto;
-	margin-top:10vh;
+	margin-top:2vh;
+	overflow-y:auto;
+	animation:fadeIn;
+	animation-duration:0.35s;
 }
 
 .form__header{
@@ -133,12 +186,31 @@
   background-color: var(--blue);
 }
 
-.form__content{
-  height:100%;
+.form__content--view{
+	height:100%;
+	overflow-y:auto;
   display: flex;
 	flex-direction: column; 
 	align-items: center;
   background-color: var(--purple--light);
+}
+
+.form__content--edit{
+	height:100%;
+	overflow-y:auto;
+  display: flex;
+	flex-direction: column; 
+	align-items: center;
+  background-color: var(--purple--light);
+}
+
+.form__content--new{
+	height:700px;
+  display: flex;
+	flex-direction: column; 
+	align-items: center;
+	background-color: var(--purple--light);
+	overflow-y:auto;
 }
 
 .form__title{
@@ -147,10 +219,22 @@
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	background-color:var(--blue);
+	background-color:var(--background);
 }
 
-.form__label{
+.form__label--left{
+	width:90%;
+	text-align:left;
+	margin-bottom:5px;
+	margin-top:15px;
+	color:var(--orange);
+}
+
+.form__label--center{
+	width:90%;
+	text-align:center;
+	margin-bottom:5px;
+	margin-top:15px;
 	color:var(--orange);
 }
 
@@ -165,7 +249,8 @@
  
 .radioContainer{
 	height:100px;
-	padding: 10px;
+	padding: 5px;
+	padding-bottom:0px;
 	align-items: center;
 	justify-content:center;
   display: flex;
@@ -176,7 +261,6 @@
 	display: flex ;
 	border:1px solid white;
 	border-radius:10px;
-	padding-bottom:10px;
 	margin-bottom:20px;
 }
 
@@ -186,19 +270,170 @@
 }
 
 .saveButton{
+	cursor:cursor;
+	font-size:20px;
   height: 60px;
   width: 60px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: auto;
-  margin-bottom: 10px;
+  margin-top: 20px;
   background-color: #6272a4;
   border: none;
   border-radius: 5px;
 }
 
+.Notification{
+	display:flex;
+	justify-content: center;
+	align-items: center;
+	position:absolute;
+	width:100%;
+	height:40px;
+	z-index:2;
+	animation-name:fadeIn;
+	animation-duration:1.5s; 
+}
+
+.Notification__text{
+	color:black;
+
+}
+
+/**Media Queries*//
 @media screen and (max-width: 650px) {
 	.EntryButton{
 	 font-size:small;
 	}
+}
+@media screen and (max-height:900px){
+.form__content--edit{
+	height:670px;
+}
+.form__content--new{
+	height:670px;
+ } 
+}
+
+
+/**Calendar **/
+
+.react-calendar {
+  width: 350px;
+	max-width: 100%;
+	background:#343a40;
+	border: 2px solid gray;
+	border-radius:5px;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.125em;
+}
+.react-calendar--doubleView {
+  width: 700px;
+}
+.react-calendar--doubleView .react-calendar__viewContainer {
+  display: flex;
+  margin: -0.5em;
+}
+.react-calendar--doubleView .react-calendar__viewContainer > * {
+  width: 50%;
+  margin: 0.5em;
+}
+.react-calendar,
+.react-calendar *,
+.react-calendar *:before,
+.react-calendar *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.react-calendar button {
+  margin: 0;
+  border: 0;
+  outline: none;
+}
+.react-calendar button:enabled:hover {
+  cursor: pointer;
+}
+.react-calendar__navigation {
+  height: 24px;
+  margin-bottom: 1em;
+}
+.react-calendar__navigation button {
+  min-width: 44px;
+  background-color: black;
+}
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: gray;
+}
+.react-calendar__navigation button[disabled] {
+  background-color: gray;
+}
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+	font-size: 0.75em;
+}
+.react-calendar__month-view__weekdays__weekday {
+	color:#6495ed;
+  padding: 0.5em;
+}
+.react-calendar__month-view__weekNumbers {
+  font-weight: bold;
+}
+.react-calendar__month-view__weekNumbers .react-calendar__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75em;
+  padding: calc(0.75em / 0.75) calc(0.5em / 0.75);
+}
+.react-calendar__month-view__days__day--weekend {
+  color: #ff8933;
+}
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #757575;
+}
+.react-calendar__year-view .react-calendar__tile,
+.react-calendar__decade-view .react-calendar__tile,
+.react-calendar__century-view .react-calendar__tile {
+  padding: 2em 0.5em;
+}
+.react-calendar__tile {
+  max-width: 100%;
+  text-align: center;
+  padding: 0.75em 0.5em;
+  background: none;
+}
+.react-calendar__tile:disabled {
+  background-color: #f0f0f0;
+}
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #3e444a;
+}
+.react-calendar__tile--now { 
+  background:#343a40;
+}
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+  background: gray;
+}
+.react-calendar__tile--hasActive {
+  background: #006edc;
+}
+.react-calendar__tile--hasActive:enabled:hover,
+.react-calendar__tile--hasActive:enabled:focus {
+  background: #a9d4ff;
+}
+.react-calendar__tile--active {
+  background: #006edc;
+  color: white;
+}
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+  background: #006edc;
+}
+.react-calendar--selectRange .react-calendar__tile--hover {
+  background-color: #e6e6e6;
 }

@@ -1,67 +1,94 @@
-import { useHistory } from "react-router-dom"
+import { useHistory,Link } from "react-router-dom"
+import {useEffect} from "react"
 import { useState } from "react"
 import { AiOutlineCloseCircle } from "react-icons/ai"
-import { postPage } from '../API_calls/calls'
+import { postPage } from '../Functions/api_calls'
+import Calendar from "react-calendar"
 
-const NewOverlay = ({ pages, setPages }) =>
+const NewOverlay = ({ setNotification,pages, setPages }) =>
 {
 	const history = useHistory()
-	const [ newPage, setNewPage ] = useState({ title: "", description: "", type: null })
+	const [ newPage, setNewPage ] = useState({ title: "", description: "", type: null, publishedOn:new Date() })
+	const [deploymentDate,setDeploymentDate]=useState(new Date());
+
+	useEffect(()=>{
+		setNewPage({...newPage,publishedOn:deploymentDate}) 
+	},[deploymentDate])
 
 	return (
 		<div className="formContainer">
 			<div className={ "form__title" }>
 				<h3 style={ { marginLeft: "20px", whiteSpace: "normal", overflow: "hidden", textOverflow: "ellipsis" } }>New Page</h3>
+				<Link style={ { marginLeft: "auto", marginRight: "15px", justifySelf: "flex-end", alignSelf: "flex-end", marginTop: "5px", } }
+					to="/admin"  >
 				<AiOutlineCloseCircle size={"30px"}
-					style={ { marginLeft: "auto", marginRight: "15px", justifySelf: "flex-end", alignSelf: "flex-end", marginTop: "5px", } }
-					onClick={() => { history.push("/admin") }} />   {/*TODO wrap in button for accessibility */ }
+					/>
+</Link>
 			</div>
 
-			<div className={ "form__content" } style={ { paddingTop: "10px" } }>
-				<input className={ "form__input--text" } placeholder={ "Title" } value={ newPage.title }
+			<div className={ "form__content--new" } >
+				<h2 className="form__label--left">Title *</h2>
+				<input maxLength="50" className={ "form__input--text" } placeholder={ "Title (max 50 chars)" } value={ newPage.title }
 					onChange={ (event) => { setNewPage({ ...newPage, title: event.target.value }) } } />
-				<textarea className={ "form__input--text" } style={ { height: "80px" } } placeholder={ "Description" } value={ newPage.description }
-					onChange={ (event) => { setNewPage({ ...newPage, description: event.target.value }) } } />  {/**TODO enforce restrictions*/ }
+						<h2 className="form__label--left">Description </h2>
+				<div style={{width:"100%"}}>
+					<textarea maxLength="200" className={ "form__input--text" } placeholder={ "Description (max 200 chars)" }
+						value={ newPage.description }
+						onChange={ (event) => { setNewPage({ ...newPage, description: event.target.value }) } } />
+				</div>
 
-				<h2 className={ "form__label" } style={ { marginTop: "20px", marginBottom: "10px", } }>Type</h2>
-				<form className={ "radioForm" } >
-					<div className="radioContainer" >
-						<input type="radio" value="0" id="Menu"
-							onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
-						<label className={ "radio__label" }>Menu</label>
-					</div>
+				<h2 className={ "form__label--center" } style={ { marginTop: "20px", marginBottom: "10px", } }>Type *</h2>
+				<div>
+					<form className={ "radioForm" } >
+						<div className="radioContainer" >
+							<input type="radio" value="0" id="Menu"
+								onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
+							<label className={ "radio__label" }>Menu</label>
+						</div>
 
-					<div className="radioContainer" >
-						<input type="radio" value="1" id="Events"
-							onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
-						<label className={ "radio__label" }>Events</label>
-					</div>
+						<div className="radioContainer" >
+							<input type="radio" value="1" id="Events"
+								onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
+							<label className={ "radio__label" }>Events</label>
+						</div>
 
-					<div className="radioContainer">
-						<input type="radio" value="2" id="Content"
-							onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
-						<label className={ "radio__label" }>Content</label>
-					</div>
-				</form>
+						<div className="radioContainer">
+							<input type="radio" value="2" id="Content"
+								onChange={ (e) => { setNewPage({ ...newPage, type: parseInt(e.target.value) }) } } name="Type" />
+							<label className={ "radio__label" }>Content</label>
+						</div>
+					</form>
+				</div>
+				<h2 className={ "form__label--center" } style={ { marginTop: "20px", marginBottom: "10px", } }>Deployment Date *</h2>
+				<Calendar value={deploymentDate} onChange={setDeploymentDate}/>
 
+<div style={{width:"100%"}}>
 				<button
 					className="saveButton"
 					onClick={ async () =>
 					{
-						if (!newPage.type || !newPage.title || !newPage.description) {
-							console.log("Please provide all requested information")  // TODO notification
+						if (newPage.type===null || !newPage.title) {
+							setNotification({message:"Please provide all requested information",color:"red"})
 							return
 						}
+						if(newPage.publishedOn<new Date()){
+							setNotification({message:"Please provide a valid future date",color:"red"})
+							return 
+						}
+
 						try {
-							const updatedPage = await postPage({ ...newPage, type: parseInt(newPage.type) })/*TODO fix type, extract function from other overlay*/
-							setPages(pages.concat(updatedPage)) // add updated TODO internal server error...
+							const updatedPage = await postPage({ ...newPage, type: newPage.type })
+							setPages(pages.concat(updatedPage)) // add updated page
+							setNotification({message:"Page added successfully",color:"white"})
+							history.push("/admin")
 						}
 						catch{
-							console.log("something failed")  //TODO notification
+							setNotification({message:"Something went wrong",color:"red"})
 						}
 					} }>
-					save
+					Save
 					</button>
+</div>
 			</div>
 		</div>
 	)
