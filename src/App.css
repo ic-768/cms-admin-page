@@ -139,10 +139,11 @@ textarea{
 
 .dragArea{
 	background-color:var(--background);
+	opacity:0.95;
  	flex-wrap: wrap;
  	display: flex; 
-	 border-radius: 10px;
-	 margin-top:10px;
+	border-radius: 10px;
+	margin-top:10px;
 	height:75vh;
 	justify-content: center;
 	overflow-y:auto;
