@@ -26,7 +26,7 @@ const PageOverlay = ({ setNotification,page, pages, setPages }) => {
 					<div style={{
 						display: "flex", alignItems: "center", marginLeft: "auto", marginRight: "15px", 
 						alignSelf: "flex-end", color: "white", height: "100%" }}>
-						<AiOutlineEdit style={{marginRight:"18px"}}
+						<AiOutlineEdit style={{cursor:"pointer",marginRight:"18px"}}
 							onClick={ () => { setIsEditable(!isEditable) } } size={ "30" } />
 
 						<Link style={{ justifySelf: "flex-end", alignSelf: "flex-end", marginTop: "5px" } } to="/admin" >

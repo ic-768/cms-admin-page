@@ -24,9 +24,15 @@
 }
 
 @keyframes shadowExpand {
-  0%   { box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1); }
+	0%   {box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1); }
+	50% {box-shadow: 1px 0px 1px 20px var(--orange);}
   100% { box-shadow: 1px 0px 1px 40px var(--blue); }
 } 
+
+@keyframes colorChange {
+  0%   { box-shadow: 0px 0px 0px 0px var(--blue);}
+} 
+
 
 input{
 	font-size:18px; 
@@ -81,16 +87,16 @@ textarea{
 	display: inline-block;
 	position: relative;
 	text-decoration: none;
-	color: rgba(3, 169, 244, 0.54);
 	width: 300px;
 	height: 300px;
 	border-radius: 50%;
 	text-align: center;
-	background: var(--purple--light);
+	background: var(--purple--dark);
 	box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.08);
 }
 
 .entryButton__contents{
+	cursor:pointer;
 	position: absolute;
 	width: 180px;
 	height: 180px;
@@ -100,10 +106,8 @@ textarea{
 	top: 56px;
 	border-radius: 50%;
 	font-size: 40px;
-	background-image: -webkit-linear-gradient(#e8e8e8 0%, #000000 100%);
-	background-image: linear-gradient(#b6b6b6 0%, var(--background) 100%);
-	box-shadow: inset 0 2px 0 rgba(255,255,255,0.5), 0 2px 2px rgba(0, 0, 0, 0.19);
-	border-bottom: solid 2px #b5b5b5;
+	box-shadow: inset 0 2px 0 var(--orange), 0 2px 2px var(--blue);
+	border-bottom: solid 1px #ffffff;
 	display:flex;
 	align-items:center;
 	justify-content:center; 
@@ -114,6 +118,9 @@ textarea{
 	animation-duration:1s; 
 	animation-fill-mode: forwards;  
 } 
+.entryButton__contents:active{
+	box-shadow: inset 0 2px 0 white, 0 2px 2px orange;
+}
 
 .dropZoneContainer{
 	margin-right:15px;
@@ -311,7 +318,7 @@ textarea{
 }
 
 .saveButton{
-	cursor:cursor;
+	cursor:pointer;
 	font-size:20px;
   height: 60px;
   width: 60px;
@@ -322,6 +329,7 @@ textarea{
   border: none;
   border-radius: 5px;
 }
+
 
 .Notification{
 	display:flex;
@@ -336,8 +344,48 @@ textarea{
 }
 
 .Notification__text{
-	color:black;
+	color:black; 
+}
 
+.confirmationPrompt{
+	animation:fadeIn;
+	animation-duration:1s;
+	border:1px solid white;
+	border-radius:8px;
+	background-color:var(--purple--light); 
+	position:absolute;
+	left:0;
+	right:0;
+	top:0;
+	bottom:0;
+	margin-left:auto;
+	margin-top:15vh;
+	margin-bottom:auto;
+	margin-right:auto;
+	height:200px;
+	width:500px;
+	z-Index:2;
+	display:flex;
+	flex-direction:column;
+}
+
+.yesButton{
+	background-color: #6272a4;
+	width:60px;
+	height:40px;
+	border:none;
+	border-radius:5px;
+	margin-bottom:10px;
+	color:var(--orange); 
+	margin-right:30px;
+}
+
+.noButton{
+	width:60px;
+	height:40px;
+	border:none;
+	border-radius:5px;
+	color:var(--purple--dark); 
 }
 
 /**Media Queries*/

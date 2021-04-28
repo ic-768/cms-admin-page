@@ -1,7 +1,7 @@
 import { Draggable, Droppable } from "react-beautiful-dnd"
 import PageCard from "./PageCard"
 
-const DropZone = ({ setNotification,droppableId, pages, setPages, filteredResults }) =>{
+const DropZone = ({ setConfirmation,setNotification,droppableId, pages, setPages, filteredResults }) =>{
 /*Dropzones for user to drag pages to and set active or inactive. Since there are only two dropzones,
 droppableIds will either be "active" or "inactive" */
 
@@ -33,10 +33,10 @@ droppableIds will either be "active" or "inactive" */
 										{ ...provided.draggableProps }
 										{ ...provided.dragHandleProps } >
 										{ droppableId === "active" && page.isActive && 
-											<PageCard setNotification={setNotification} page={page} pages={pages} setPages={setPages}
+											<PageCard setConfirmation={setConfirmation} setNotification={setNotification} page={page} pages={pages} setPages={setPages}
 												key={ `${page.id.toString()}${i}` } /> }
 										{ droppableId === "inactive" && !page.isActive &&
-											<PageCard setNotification={setNotification} page={page} pages={pages} setPages={setPages}
+											<PageCard setConfirmation={setConfirmation} setNotification={setNotification} page={page} pages={pages} setPages={setPages}
 												key={ `${page.id.toString()}${i}` } 
 											/> }
 									</div>

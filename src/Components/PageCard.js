@@ -4,9 +4,8 @@ import { BsFillEyeFill } from "react-icons/bs"
 import { deletePage } from "../Functions/api_calls"
 import {Link } from "react-router-dom"
 
-const PageCard = ({ setNotification, page, pages, setPages }) => {
-/* Page box, displaying title and publishing date, rendered draggable in dropZone.js */
-
+const PageCard = ({ setConfirmation,setNotification, page, pages, setPages }) => {
+/* Page box, displaying title and publishing date, rendered draggable in dropZone.js */ 
 	const activeColor = page.isActive ? "#44475A" : "#777777" //dynamic appearance
 	const opacity = page.isActive ? "1" : "0.65"
 
@@ -23,8 +22,10 @@ const PageCard = ({ setNotification, page, pages, setPages }) => {
 				<Link to={ `/admin/${page.id}` }>
 					<BsFillEyeFill style={{ cursor: "pointer", fontSize: "20px", marginBottom: "20px" }}/>
 				</Link>
-				<Link to="/admin" onClick={
-					async () => {
+					<GoTrashcan style={{ cursor: "pointer", fontSize: "20px" }} 
+				onClick={()=>setConfirmation({ 
+				message:`Are you sure you want to delete ${page.title}?`,
+				yesCallback: async () => {
 						try {
 							const deletedID = await deletePage(page.id)
 							setPages(pages.filter((page) => page.id !== deletedID))
@@ -33,10 +34,12 @@ const PageCard = ({ setNotification, page, pages, setPages }) => {
 						catch{
 							setNotification({ message: "Something went wrong", color: "red" }) 
 						}
-					} 
-				}>
-					<GoTrashcan style={{ cursor: "pointer", fontSize: "20px" }}/>
-				</Link>
+						setConfirmation(null)
+					} ,
+					noCallback:()=>{setConfirmation(null)}
+				} 
+			)}
+					/>
 			</div>
 		</div>
 	)

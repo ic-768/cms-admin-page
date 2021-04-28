@@ -5,18 +5,16 @@ const Home = ({pages}) => {
 	const backgroundImage="/desk_background.jpg"
 
 	return(
-			<div className="PageContainer"style={{
-backgroundImage:`url(${backgroundImage})`,
-backgroundSize:"cover",backgroundRepeat:"noRepeat",
+			<div className="PageContainer"style={{ backgroundImage:`url(${backgroundImage})`,
+				backgroundSize:"cover",backgroundRepeat:"noRepeat",
 				flexDirection:"column",
 				alignItems:"center",
 				justifyContent:"center" }} > 
 					<button className="entryButton" 
 						onClick={()=>{history.push("/admin")}}> 
 						<h1 className="entryButton__contents">
-						{pages && pages.length}
+						{(pages && pages.length) || "Pages"} {/*Show num pages, or if api taking long, show "Pages" */}
 						</h1>
-						<p>{pages && pages.length}</p> {/*Pages retrieved, show how many*/}
 					</button>
 			</div> 
 	)
