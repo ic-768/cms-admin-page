@@ -350,7 +350,7 @@ textarea{
 
 .confirmationPrompt{
 	animation:fadeIn;
-	animation-duration:1s;
+	animation-duration:0.4s;
 	border:1px solid white;
 	border-radius:8px;
 	background-color:var(--purple--light); 
@@ -379,6 +379,7 @@ textarea{
 	margin-bottom:10px;
 	color:var(--orange); 
 	margin-right:30px;
+	cursor:pointer;
 }
 
 .noButton{
@@ -387,6 +388,7 @@ textarea{
 	border:none;
 	border-radius:5px;
 	color:var(--purple--dark); 
+	cursor:pointer;
 }
 
 /**Media Queries*/

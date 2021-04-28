@@ -16,8 +16,8 @@ const AdminCenter = ({ setPages, pages }) => {
 	const [focusedPageID, setFocusedPageID] = useState(null) //page to view or edit
 	const [filterQuery, setFilterQuery] = useState("")
 	const [filteredResults, setFilteredResults ] = useState(pages) //which pages to show 
-	const [isLoading,setIsLoading]=useState(false) //set spinner animation while api call in progress
 	const [notification,setNotification]=useState(null) // if notification to be shown, will be object {message:,color:}
+	const [isLoading,setIsLoading]=useState(false) // if notification to be shown, will be object {message:,color:}
 
 	// if user confirmation needed, ConfirmationPrompt component will use values here
 	const [confirmation,setConfirmation]=useState({message:"",yesCallback:null,noCallback:null}) 
@@ -25,7 +25,6 @@ const AdminCenter = ({ setPages, pages }) => {
 	const currPath = useLocation()
 	const backgroundImage="/bg.jpg"
 
-	console.log(confirmation)
 	useEffect(() =>{ //get ID parameter from url
 		setFocusedPageID(
 			currPath.pathname.match(/.*\/(\d+)/)
@@ -56,7 +55,8 @@ const AdminCenter = ({ setPages, pages }) => {
 			yesCallback={confirmation.yesCallback} noCallback={confirmation.noCallback} />}
 			{notification && <Notification message={notification.message} color={notification.color}/>}
 			<Banner filterQuery={ filterQuery } setFilterQuery={ setFilterQuery } username="Ioannis"/> 
-			<PropagateLoader loading={isLoading} color="white" css="position:absolute,left:0px,right:0px"/> {/*shown during api calls*/}
+			<PropagateLoader loading={isLoading} color="white" css="position:absolute,left:0px,right:0px"/> {/*shown during api call*/}
+
 
 			<div className="PageContainer" style={{ 
 				backgroundImage:`url(${backgroundImage})`, 
