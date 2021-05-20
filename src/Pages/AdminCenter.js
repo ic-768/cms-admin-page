@@ -77,30 +77,26 @@ const AdminCenter = ({setPages, pages}) => {
         }}>
         <div className="dropZoneRow">
           <DragDropContext //context for drag interactions
-            onDragEnd={async (result) => {
+            onDragEnd={async (result) => { // drag-drop logic
+
               if (!result.destination) {
+                // dragged outside valid areas
                 return
-              } // dragged outside valid areas
+              }
+
               const draggedId = result.draggableId.match(/\d+/)[0] // item id
               const targetPage = pages.filter((page) => page.id === parseInt(draggedId))[0] //get page by id
               const itemActivity = result.draggableId.match(/\d+ (.*)/)[1] // item currently active or inactive
               const destActivity = result.destination.droppableId // which area item was dragged to
 
-              if (itemActivity === "active" && destActivity === "inactive") {
-                // set inactive
+              if (itemActivity !== destActivity) { // active item dragged to inactive area or vice versa
                 try {
                   setIsLoading(true)
-                  const updatedPage = await updatePage({...targetPage, isActive: false, publishedOn: new Date()}) //TODO doesn't work if same day
-                  setPages(pages.filter((page) => page.id !== parseInt(draggedId)).concat(updatedPage))
-                } catch {
-                  setNotification({message: "Something went wrong", color: "red"})
-                }
-                setIsLoading(false)
-              } else if (itemActivity === "inactive" && destActivity === "active") {
-                //set active
-                try {
-                  setIsLoading(true)
-                  const updatedPage = await updatePage({...targetPage, isActive: true, publishedOn: new Date()})
+                  const updatedPage = await updatePage({
+                    ...targetPage,
+                    isActive: itemActivity === "active" ? false : true, //set to opposite of current state
+                    publishedOn: new Date(), //TODO doesn't work if same day ( server returns time 0, user time is always more)
+                  })
                   setPages(pages.filter((page) => page.id !== parseInt(draggedId)).concat(updatedPage))
                 } catch {
                   setNotification({message: "Something went wrong", color: "red"})
